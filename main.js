@@ -5,72 +5,71 @@ const msgElm = document.querySelector(".msg");
 const collectionElm = document.querySelector(".collection");
 const form = document.querySelector("form");
 
-
-const products = [
-    // {
-    //     id: 1,
-    //     name: "banana",
-    //     price: 30
-    // }, {
-    //     id: 1,
-    //     name: "banana",
-    //     price: 30
-    // }
-]
+let products = [
+  // {
+  //     id: 1,
+  //     name: "banana",
+  //     price: 30
+  // }, {
+  //     id: 1,
+  //     name: "banana",
+  //     price: 30
+  // }
+];
 
 function receiveInputs() {
-    const name = nameInputElm.value;
-    const price = priceInputElm.value;
+  const name = nameInputElm.value;
+  const price = priceInputElm.value;
 
-    return {name, price};
+  return { name, price };
 }
 
 function clearMessage() {
-    msgElm.textContent = "";
+  msgElm.textContent = "";
 }
 
 function showMessage(msg, action = "success") {
-    const textMsg = `<div class="alert alert-${action}" role="alert">
+  const textMsg = `<div class="alert alert-${action}" role="alert">
     ${msg}
   </div>`;
-    msgElm.insertAdjacentHTML("afterbegin", textMsg);
-    setTimeout(() => {
-        clearMessage();
-    }, 1000);
+  msgElm.insertAdjacentHTML("afterbegin", textMsg);
+  setTimeout(() => {
+    clearMessage();
+  }, 1000);
 }
 
 function validateInputs(name, price) {
-    let isValid = true;
-    if (name === "" || price === "") {
-        isValid = false;
-        showMessage("Please enter all fields", 'danger');
-    }
+  let isValid = true;
+  if (name === "" || price === "") {
+    isValid = false;
+    showMessage("Please enter all fields", "danger");
+  }
 
-    if (Number(price) !== Number(price)) {
-        isValid = false;
-        showMessage("Please enter price", 'danger');
-    }
-    return isValid;
+  if (Number(price) !== Number(price)) {
+    isValid = false;
+    showMessage("Please enter price", "danger");
+  }
+  return isValid;
 }
 
 function resetInput() {
-    nameInputElm.value = ''
-    priceInputElm.value = ''
+  nameInputElm.value = "";
+  priceInputElm.value = "";
 }
 function addProduct(name, price) {
-    const product = {
-        id: products.length + 1,
-        name,
-        price
-    }
+  const product = {
+    id: products.length + 1,
+    name,
+    price,
+  };
 
-    // memory data store
-    products.push(product);
-    return product;
+  // memory data store
+  products.push(product);
+  return product;
 }
 function showProductToUI(productInfo) {
-    const {id, name, price} = productInfo;
-    const elm = `<li
+  const { id, name, price } = productInfo;
+  const elm = `<li
     class="list-group-item collection-item d-flex flex-row justify-content-between"
     data-productId = "${id}";
   >
@@ -81,39 +80,53 @@ function showProductToUI(productInfo) {
       <i class="fa fa-pencil-alt float-right me-2 edit-product"></i>
       <i class="fa fa-trash-alt float-right  delete-product"></i>
     </div>
-  </li>`
-    collectionElm.insertAdjacentHTML("afterbegin", elm);
+  </li>`;
+  collectionElm.insertAdjacentHTML("afterbegin", elm);
 }
-function handleFormSubmit(event) { // prevent browser reload
-    event.preventDefault();
+function handleFormSubmit(event) {
+  // prevent browser reload
+  event.preventDefault();
 
-    // reveice input data
-    const {name, price} = receiveInputs();
-    const isValided = validateInputs(name, price);
-    if (! isValided) 
-        return;
-    
+  // reveice input data
+  const { name, price } = receiveInputs();
+  const isValided = validateInputs(name, price);
+  if (!isValided) return;
 
+  // reset the input
+  resetInput();
 
-    // reset the input
-    resetInput();
+  const product = addProduct(name, price);
 
-    const product = addProduct(name, price);
+  showProductToUI(product);
 
-    showProductToUI(product);
-
-    console.log(name, price);
+  console.log(name, price);
 }
 
 form.addEventListener("submit", handleFormSubmit);
 
+function removeItem(id) {
+  products = products.filter((product) => product.id !== id);
+}
+
+function removeItemFromUI(id) {
+  document.querySelector(`[data-productId="${id}"]`).remove();
+  showMessage("Product deleted successfully", "warning");
+}
+
 function getProductId(event) {
-    console.log(event.target.parentElement.parentElement.);
+  const liElm = event.target.parentElement.parentElement;
+  const id = Number(liElm.getAttribute("data-productId"));
+  //remove product from data store
+  removeItem(id);
+  //remove product form ui
+  removeItemFromUI(id);
 }
 
 function handleManipulateProduct(event) {
-    if (event.target.classList.contains('delete-product')) { // get the product ID
-        getProductId(event);
-    }
-    // console.log(event.target)
-}collectionElm.addEventListener('click', handleManipulateProduct)
+  if (event.target.classList.contains("delete-product")) {
+    // get the product ID
+    getProductId(event);
+  }
+  // console.log(event.target)
+}
+collectionElm.addEventListener("click", handleManipulateProduct);
