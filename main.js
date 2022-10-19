@@ -29,8 +29,8 @@ function clearMessage() {
     msgElm.textContent = "";
 }
 
-function showMessage(msg) {
-    const textMsg = `<div class="alert alert-danger" role="alert">
+function showMessage(msg, action = "success") {
+    const textMsg = `<div class="alert alert-${action}" role="alert">
     ${msg}
   </div>`;
     msgElm.insertAdjacentHTML("afterbegin", textMsg);
@@ -43,12 +43,12 @@ function validateInputs(name, price) {
     let isValid = true;
     if (name === "" || price === "") {
         isValid = false;
-        showMessage("Please enter all fields");
+        showMessage("Please enter all fields", 'danger');
     }
 
     if (Number(price) !== Number(price)) {
         isValid = false;
-        showMessage("Please enter price");
+        showMessage("Please enter price", 'danger');
     }
     return isValid;
 }
@@ -69,7 +69,20 @@ function addProduct(name, price) {
     return product;
 }
 function showProductToUI(productInfo) {
-  
+    const {id, name, price} = productInfo;
+    const elm = `<li
+    class="list-group-item collection-item d-flex flex-row justify-content-between"
+    data-productId = "${id}";
+  >
+    <div class="product-info">
+      <strong>${name}</strong>- <span class="price">$${price}</span>
+    </div>
+    <div class="action-btn">
+      <i class="fa fa-pencil-alt float-right me-2 edit-product"></i>
+      <i class="fa fa-trash-alt float-right  delete-product"></i>
+    </div>
+  </li>`
+    collectionElm.insertAdjacentHTML("afterbegin", elm);
 }
 function handleFormSubmit(event) { // prevent browser reload
     event.preventDefault();
@@ -93,3 +106,14 @@ function handleFormSubmit(event) { // prevent browser reload
 }
 
 form.addEventListener("submit", handleFormSubmit);
+
+function getProductId(event) {
+    console.log(event.target.parentElement.parentElement.);
+}
+
+function handleManipulateProduct(event) {
+    if (event.target.classList.contains('delete-product')) { // get the product ID
+        getProductId(event);
+    }
+    // console.log(event.target)
+}collectionElm.addEventListener('click', handleManipulateProduct)
